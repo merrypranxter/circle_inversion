@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "name": "circle_inversion",
+  "kind": ["mathematics", "generative-art", "svg-vector", "browser-tool"],
+  "status": "implemented v1; test suite provided; no hosted deployment implied",
+  "operator": "Euclidean inversion in circle",
+  "math": "I(p) = c + R^2 * (p-c) / |p-c|^2; p != c; R > 0",
+  "inputs": ["JSON polyline arrays", "built-in deterministic source motifs", "exact circle/line objects via JS API"],
+  "outputs": ["filled-path SVG glyph", "3x3 SVG sheet with nine separate groups", "PNG sheet in browser", "recipe JSON"],
+  "parameters": ["seed", "radius", "center_x", "center_y", "filled_width", "invert_toggle", "individual per-glyph preset"],
+  "integration_parents": {
+    "apollonian_gasket": "circle packing supplies source circles",
+    "noneuclidean": "geometry context only",
+    "slime_molds": "source network polylines",
+    "op_art_style": "finishing stage only",
+    "daddydingy": "font and glyph consumer",
+    "git_shitter": "source-grounded crossbreed prompts",
+    "monetize": "optional separate downstream commercial fork"
+  },
+  "invariants": ["reference circle fixed", "involution away from pole", "generalized circles to generalized circles", "orientation reversing"],
+  "limitations": ["adaptive polylines approximate arcs", "unbounded runs are clipped/broken", "SVG filled shapes are not boolean-unioned", "no automatic store publishing"],
+  "test_command": "npm test",
+  "runtime_cost": "none",
+  "references": ["https://mathworld.wolfram.com/Inversion.html", "https://encyclopediaofmath.org/wiki/Inversion"]
+}

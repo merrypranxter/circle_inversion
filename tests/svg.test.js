@@ -1,0 +1,10 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {invertPolyline,fitPaths} from '../src/math/sampling.js';
+import {polylineFillPath,renderSheetSVG,renderGlyphSVG} from '../src/export/svg.js';
+import {getMotifs,validatePaths} from '../src/math/motifs.js';
+import {PRESETS} from '../src/data/presets.js';
+test('adaptive inversion retains finite output near singularity',()=>{const r=invertPolyline([{x:-1,y:0},{x:0,y:0},{x:1,y:0}],{radius:1,limit:10});for(const p of r.flat())assert.ok(Number.isFinite(p.x)&&Number.isFinite(p.y))});
+test('real filled geometry, no stroke attribute',()=>{const d=polylineFillPath([{x:1,y:1},{x:4,y:5}],2);assert.match(d,/M/);assert.match(d,/ Z/);const svg=renderGlyphSVG([[{x:1,y:1},{x:4,y:5}]]);assert.match(svg,/fill="#000000"/);assert.doesNotMatch(svg,/stroke=/)});
+test('3x3 vector sheet contains nine individual glyph IDs',()=>{const motifs=getMotifs(27);const glyphs=motifs.map((m,i)=>({id:PRESETS[i].id,paths:fitPaths(m.paths)}));const sheet=renderSheetSVG(glyphs);assert.equal((sheet.match(/id="glyph-/g)||[]).length,9);assert.equal((sheet.match(/fill="#000000"/g)||[]).length,9);assert.doesNotMatch(sheet,/NaN|Infinity|<line |<polyline /)});
+test('JSON polyline importer validation and limits',()=>{assert.equal(validatePaths({paths:[[{x:0,y:0},{x:1,y:1}]]}).length,1);assert.throws(()=>validatePaths({paths:[[{x:0,y:0},{x:'no',y:0}]]}));assert.throws(()=>validatePaths({paths:[]}))});
+test('deterministic motif construction',()=>assert.deepEqual(getMotifs(100),getMotifs(100)));

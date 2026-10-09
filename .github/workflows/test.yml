@@ -1,0 +1,26 @@
+name: Math and SVG tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm test
+      - name: Check source syntax
+        run: |
+          node --check src/app.js
+          node --check src/math/inversion.js
+          node --check src/math/sampling.js
+          node --check src/math/motifs.js
+          node --check src/export/svg.js
+      - name: Reject accidental secrets
+        run: |
+          if find . -name '.env' -o -name '*.pem' -o -name 'id_rsa' | grep -q .; then echo 'Secret-like file detected'; exit 1; fi

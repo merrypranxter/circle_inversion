@@ -1,0 +1,11 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {invertPoint,invertCircle,invertLine,composeInversions} from '../src/math/inversion.js';
+const near=(a,b,e=1e-8)=>assert.ok(Math.abs(a-b)<e,`${a} ≠ ${b}`);
+test('reference inversion fixes every point on the circle',()=>{for(let i=0;i<24;i++){const t=i*Math.PI/12,p={x:3+2*Math.cos(t),y:-1+2*Math.sin(t)};const q=invertPoint(p,{x:3,y:-1},2);near(q.x,p.x);near(q.y,p.y)}});
+test('involution and finite composition',()=>{const c={x:-2,y:4},p={x:2,y:-3},q=invertPoint(p,c,3),back=invertPoint(q,c,3);near(back.x,p.x);near(back.y,p.y);const chain=composeInversions(p,[{center:c,radius:3},{center:c,radius:3}]);near(chain.x,p.x)});
+test('pole is explicit null',()=>assert.equal(invertPoint({x:1,y:2},{x:1,y:2},1),null));
+test('circle not through center maps to circle',()=>{const v=invertCircle({x:3,y:0,r:1},{x:0,y:0},2);assert.equal(v.kind,'circle');near(v.x,1.5);near(v.r,.5)});
+test('circle through center maps to line',()=>{const v=invertCircle({x:1,y:0,r:1},{x:0,y:0},2);assert.equal(v.kind,'line');near(v.point.x,2);near(v.direction.x,0)});
+test('line not through center maps to circle through center',()=>{const v=invertLine({point:{x:1,y:0},direction:{x:0,y:1}},{x:0,y:0},2);assert.equal(v.kind,'circle');near(v.x,2);near(v.r,2)});
+test('line through center maps to line',()=>assert.equal(invertLine({point:{x:0,y:0},direction:{x:1,y:1}},{x:0,y:0},1).kind,'line'));
+test('invalid radius throws',()=>assert.throws(()=>invertPoint({x:1,y:2},{x:0,y:0},0),RangeError));
